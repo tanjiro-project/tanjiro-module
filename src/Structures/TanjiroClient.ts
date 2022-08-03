@@ -6,11 +6,12 @@ import pino from "pino";
 import { fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
 import { Util } from "../Utilities/Util.js";
-import { APIUser } from "discord-api-types/v10";
+import { APIUser, GatewayDispatchEvents } from "discord-api-types/v10";
 import redis from "ioredis";
 import { CommonEvents } from "../Utilities/Enums/CommonEvents.js";
 import { ListenerStore } from "../Stores/ListenerStore.js";
 import { createAmqp, RoutingSubscriber } from "@nezuchan/cordis-brokers";
+import { Constants } from "../Utilities/Constants.js";
 
 export class TanjiroClient extends EventEmitter {
     public rest = new REST();
@@ -70,6 +71,15 @@ export class TanjiroClient extends EventEmitter {
     public async intializeAmqp(): Promise<void> {
         const { channel } = await createAmqp(process.env.AMQP_HOST!);
         this.amqpTwilightReceiver = new RoutingSubscriber(channel);
+        await this.amqpTwilightReceiver.init({
+            name: Constants.GATEWAY,
+            durable: true,
+            exchangeType: "topic",
+            useExchangeBinding: true,
+            keys: [
+                GatewayDispatchEvents.MessageCreate
+            ]
+        });
     }
 
     public async initializeStores(): Promise<void> {

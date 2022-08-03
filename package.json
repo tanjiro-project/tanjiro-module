@@ -39,7 +39,8 @@
       "@hazmi35/eslint-config/typescript"
     ],
     "rules": {
-      "class-methods-use-this": "off"
+      "class-methods-use-this": "off",
+      "@typescript-eslint/naming-convention": "off"
     }
   },
   "dependencies": {
