@@ -6,3 +6,26 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Guild {
+  id        Int       @id @default(autoincrement())
+  guildId   String    @unique
+
+  phising   Phising?
+}
+
+enum PhisingLevel {
+  LOW
+  MEDIUM
+  HIGH
+  HIGHEST
+}
+
+model Phising {
+  id        Int           @id @default(autoincrement())
+  guild     Guild         @relation(fields: [guildId], references: [guildId])
+  guildId   String        @unique
+
+  enabled   Boolean       @default(false)
+  level     PhisingLevel  @default(MEDIUM)
+}
