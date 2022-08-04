@@ -10,7 +10,7 @@ import { EmbedBuilder } from "@discordjs/builders";
 
 @ApplyOptions<ListenerOptions>(({ container }) => ({
     name: "handlePhisingLinksListener",
-    emitter: container.client,
+    emitter: container.client.amqpTwilightReceiver,
     event: GatewayDispatchEvents.MessageCreate
 }))
 

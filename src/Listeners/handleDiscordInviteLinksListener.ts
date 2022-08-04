@@ -8,7 +8,7 @@ import { EmbedBuilder } from "@discordjs/builders";
 
 @ApplyOptions<ListenerOptions>(({ container }) => ({
     name: "handleDiscordInviteLinksListener",
-    emitter: container.client,
+    emitter: container.client.amqpTwilightReceiver,
     event: GatewayDispatchEvents.MessageCreate
 }))
 
