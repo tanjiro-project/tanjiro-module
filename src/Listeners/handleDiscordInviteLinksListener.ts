@@ -4,7 +4,7 @@ import { Listener, ListenerOptions } from "../Stores/Listener.js";
 import { ApplyOptions } from "../Utilities/Decorators/ApplyOptions.js";
 import { Util } from "../Utilities/Util.js";
 import { Result } from "@sapphire/result";
-import { EmbedBuilder } from "@discordjs/builders";
+import { EmbedBuilder, inlineCode } from "@discordjs/builders";
 
 @ApplyOptions<ListenerOptions>(({ container }) => ({
     name: "handleDiscordInviteLinksListener",
@@ -37,7 +37,7 @@ export class handleDiscordInviteLinksListener extends Listener {
                 embeds: [
                     new EmbedBuilder()
                         .setColor(15075685)
-                        .setDescription(`🛡 | ${deleteMessage.isOk() ? languageManager("listeners/message:anti_invite_deleted", { User: raw.d.author.username }) : languageManager("listeners/message:anti_invite_not_deleted", { User: raw.d.author.username })}`)
+                        .setDescription(`🛡 | ${deleteMessage.isOk() ? languageManager("listeners/message:anti_invite_deleted", { User: inlineCode(raw.d.author.username) }) : languageManager("listeners/message:anti_invite_not_deleted", { User: inlineCode(raw.d.author.username) })}`)
                         .toJSON()
                 ]
             }

@@ -6,7 +6,7 @@ import { Util } from "../Utilities/Util.js";
 import { fetch, HeadersInit } from "undici";
 import { Result } from "@sapphire/result";
 import { PhisingLevel } from "@prisma/client";
-import { EmbedBuilder } from "@discordjs/builders";
+import { EmbedBuilder, inlineCode } from "@discordjs/builders";
 
 @ApplyOptions<ListenerOptions>(({ container }) => ({
     name: "handlePhisingLinksListener",
@@ -41,7 +41,7 @@ export class handlePhisingLinksListener extends Listener {
                 embeds: [
                     new EmbedBuilder()
                         .setColor(15075685)
-                        .setDescription(`🛡 | ${deleteMessage.isOk() ? languageManager("listeners/message:anti_scam_deleted", { User: raw.d.author.username, totalEngine: result.unwrap().malicious }) : languageManager("listeners/message:anti_scam_not_deleted", { User: raw.d.author.username, totalEngine: result.unwrap().malicious })}`)
+                        .setDescription(`🛡 | ${deleteMessage.isOk() ? languageManager("listeners/message:anti_scam_deleted", { User: inlineCode(raw.d.author.username), totalEngine: inlineCode(String(result.unwrap().malicious)) }) : languageManager("listeners/message:anti_scam_not_deleted", { User: inlineCode(raw.d.author.username), totalEngine: inlineCode(String(result.unwrap().malicious)) })}`)
                         .toJSON()
                 ]
             }
