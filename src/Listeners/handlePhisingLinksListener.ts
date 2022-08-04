@@ -3,7 +3,7 @@ import { GatewayDispatchEvents, GatewayMessageCreateDispatch, Routes } from "dis
 import { Listener, ListenerOptions } from "../Stores/Listener.js";
 import { ApplyOptions } from "../Utilities/Decorators/ApplyOptions.js";
 import { Util } from "../Utilities/Util.js";
-import { fetch, RequestInit } from "undici";
+import { fetch, HeadersInit } from "undici";
 import { Result } from "@sapphire/result";
 import { PhisingLevel } from "@prisma/client";
 import { EmbedBuilder } from "@discordjs/builders";
@@ -57,7 +57,7 @@ export class handlePhisingLinksListener extends Listener {
             "X-VT-Anti-Abuse-Header": randomBytes(4).toString("hex")
         };
 
-        const searchForResponse = await fetch(`https://www.virustotal.com/ui/urls/search?limit=20&${encodeURIComponent("relationships[comment]")}=${encodeURIComponent("author,item")}&query=${encodeURIComponent(link)}`, headers as RequestInit);
+        const searchForResponse = await fetch(`https://www.virustotal.com/ui/search?limit=20&${encodeURIComponent("relationships[comment]")}=${encodeURIComponent("author,item")}&query=${encodeURIComponent(link)}`, { headers });
         if (searchForResponse.ok) {
             const searchAnalysesResult = await searchForResponse.json() as totalSearchResult;
             if (searchAnalysesResult.data.length) return Result.ok(searchAnalysesResult.data[0].attributes.last_analysis_stats);
@@ -71,7 +71,7 @@ export class handlePhisingLinksListener extends Listener {
         if (response.ok) {
             const getAnalysesId = await response.json() as { data: { type: "analysis"; id: string } };
             headers["Content-Type"] = "application/json";
-            const getAnalysesResult = await this.getAnalysesResult(getAnalysesId.data.id, headers as RequestInit, link);
+            const getAnalysesResult = await this.getAnalysesResult(getAnalysesId.data.id, headers, link);
             if (getAnalysesResult) {
                 return Result.ok(getAnalysesResult);
             }
@@ -80,9 +80,9 @@ export class handlePhisingLinksListener extends Listener {
         return Result.err();
     }
 
-    public async getAnalysesResult(analysesId: string, headers: RequestInit | undefined, url: string): Promise<{ malicious: number } | null> {
-        await fetch(`https://www.virustotal.com/ui/urls/analyses/${analysesId}`, headers);
-        const response = await fetch(`https://www.virustotal.com/ui/urls/search?limit=20&${encodeURIComponent("relationships[comment]")}=${encodeURIComponent("author,item")}&query=${encodeURIComponent(url)}`, headers);
+    public async getAnalysesResult(analysesId: string, headers: HeadersInit | undefined, url: string): Promise<{ malicious: number } | null> {
+        await fetch(`https://www.virustotal.com/ui/urls/analyses/${analysesId}`, { headers });
+        const response = await fetch(`https://www.virustotal.com/ui/urls/search?limit=20&${encodeURIComponent("relationships[comment]")}=${encodeURIComponent("author,item")}&query=${encodeURIComponent(url)}`, { headers });
         if (response.ok) {
             const searchAnalysesResult = await response.json() as totalSearchResult;
             if (!searchAnalysesResult.data.length) return null;
