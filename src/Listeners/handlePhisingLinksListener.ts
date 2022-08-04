@@ -49,9 +49,6 @@ export class handlePhisingLinksListener extends Listener {
     }
 
     public async getResult(link: string): Promise<Result<{ malicious: number }, unknown>> {
-        const body = new URLSearchParams();
-        body.append("url", link);
-
         const headers = {
             "Accept-Ianguage": "en-US,en;q=0.9,es;q=0.8",
             "Content-Type": "application/json",
@@ -59,6 +56,16 @@ export class handlePhisingLinksListener extends Listener {
             "X-Tool": "vt-ui-main",
             "X-VT-Anti-Abuse-Header": randomBytes(4).toString("hex")
         };
+
+        const searchForResponse = await fetch(`https://www.virustotal.com/ui/urls/search?limit=20&${encodeURIComponent("relationships[comment]")}=${encodeURIComponent("author,item")}&query=${encodeURIComponent(link)}`, headers as RequestInit);
+        if (searchForResponse.ok) {
+            const searchAnalysesResult = await searchForResponse.json() as totalSearchResult;
+            if (searchAnalysesResult.data.length) return Result.ok(searchAnalysesResult.data[0].attributes.last_analysis_stats);
+        }
+
+        const body = new URLSearchParams();
+        body.append("url", link);
+
         headers["Content-Type"] = "application/x-www-form-urlencoded";
         const response = await fetch("https://www.virustotal.com/ui/urls", { method: "POST", body, headers });
         if (response.ok) {
