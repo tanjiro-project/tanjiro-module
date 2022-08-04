@@ -7,19 +7,19 @@ import { Result } from "@sapphire/result";
 import { EmbedBuilder } from "@discordjs/builders";
 
 @ApplyOptions<ListenerOptions>(({ container }) => ({
-    name: "handlePhisingLinksListener",
+    name: "handleDiscordInviteLinksListener",
     emitter: container.client,
     event: GatewayDispatchEvents.MessageCreate
 }))
 
-export class handlePhisingLinksListener extends Listener {
+export class handleDiscordInviteLinksListener extends Listener {
     public async run(raw: GatewayMessageCreateDispatch): Promise<any> {
         if ("guild_id" in raw.d && raw.d.guild_id) {
-            const phisingSettings = await this.container.client.prisma.phising.findFirst({ where: { guildId: raw.d.guild_id } });
-            if (phisingSettings?.enabled) {
+            const inviteSettings = await this.container.client.prisma.invite.findFirst({ where: { guildId: raw.d.guild_id } });
+            if (inviteSettings?.enabled) {
                 const links = Util.extractDiscordUrls(raw.d.content);
                 for (const link of links) {
-                    const [,,,, code] = link.match(/(https?:\/\/)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com\/invite)\/([a-z-0-9A-Z]+)/gi) ?? [];
+                    const [,,,,, code] = link.match(/(https?:\/\/)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com\/invite)\/([a-z-0-9A-Z]+)/gi) ?? [];
                     if (code) {
                         const result = await Result.fromAsync(() => this.container.client.rest.get(Routes.invite(code)));
                         if (result.isOk()) return this.deleteMessage(raw);
