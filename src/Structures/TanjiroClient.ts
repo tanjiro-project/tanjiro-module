@@ -88,7 +88,8 @@ export class TanjiroClient extends EventEmitter {
             exchangeType: "topic",
             useExchangeBinding: true,
             keys: [
-                GatewayDispatchEvents.MessageCreate
+                GatewayDispatchEvents.MessageCreate,
+                GatewayDispatchEvents.MessageUpdate
             ]
         });
     }
