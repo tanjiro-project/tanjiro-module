@@ -7,12 +7,14 @@ import pino from "pino";
 import { fileURLToPath } from "node:url";
 import { resolve, dirname } from "node:path";
 import { Util } from "../Utilities/Util.js";
-import { APIUser, GatewayDispatchEvents } from "discord-api-types/v10";
+import { APIUser, GatewayDispatchEvents, Snowflake } from "discord-api-types/v10";
 import redis from "ioredis";
 import { CommonEvents } from "../Utilities/Enums/CommonEvents.js";
 import { ListenerStore } from "../Stores/ListenerStore.js";
 import { createAmqp, RoutingSubscriber } from "@nezuchan/cordis-brokers";
 import { Constants } from "../Utilities/Constants.js";
+import { i18nManager } from "@nezuchan/i18n";
+import { TFunction } from "i18next";
 
 export class TanjiroClient extends EventEmitter {
     public rest = new REST();
@@ -22,6 +24,7 @@ export class TanjiroClient extends EventEmitter {
     public user: APIUser | null = null;
     public totalShards!: number;
     public stores = new StoreRegistry();
+    public i18n = new i18nManager({ defaultNS: "default", fallbackLng: "en-US", interpolation: { escapeValue: false } }, resolve(process.cwd(), "locales"));
 
     public amqpTwilightReceiver!: RoutingSubscriber<string, Record<string, any>>;
 
@@ -54,6 +57,12 @@ export class TanjiroClient extends EventEmitter {
             day: "numeric",
             hour12: false
         }));
+    }
+
+    public async fetchLanguage(guildId: Snowflake, locale?: string): Promise<TFunction> {
+        if (locale) return this.i18n.getLanguage(locale) ?? this.i18n.getLanguage("en-US")!;
+        const guildSettings = await this.mongoPrisma.guild.findFirst({ where: { guildId } });
+        return this.i18n.getLanguage(guildSettings?.locale ?? "en-US")!;
     }
 
     public async iniitalize(): Promise<boolean> {
