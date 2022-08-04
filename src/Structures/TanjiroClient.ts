@@ -1,5 +1,6 @@
 import { REST } from "@discordjs/rest";
 import { PrismaClient } from "@prisma/client";
+import { PrismaClient as MongoPrismaClient } from "../../prisma/mongodb/index.js";
 import { container, Piece, Store, StoreRegistry } from "@sapphire/pieces";
 import EventEmitter from "node:events";
 import pino from "pino";
@@ -16,6 +17,7 @@ import { Constants } from "../Utilities/Constants.js";
 export class TanjiroClient extends EventEmitter {
     public rest = new REST();
     public prisma = new PrismaClient({ rejectOnNotFound: false });
+    public mongoPrisma = new MongoPrismaClient({ rejectOnNotFound: false });
 
     public user: APIUser | null = null;
     public totalShards!: number;

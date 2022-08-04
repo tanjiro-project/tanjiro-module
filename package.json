@@ -1,5 +1,5 @@
 {
-  "name": "template",
+  "name": "@tanjiro-project/tanjiro-module",
   "version": "1.0.0",
   "description": "A Moderation module for NezukoChan the popular Discord's bot",
   "main": "dist",
@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src --ext ts",
     "lint:fix": "eslint src --fix --ext ts",
-    "build": "prisma generate && swc src -d dist"
+    "build": "npm run generate_prisma && swc src -d dist",
+    "generate_prisma": "prisma generate && prisma generate --schema prisma/mongo_schema.prisma"
   },
   "type": "module",
   "author": "KagChi",
