@@ -81,7 +81,12 @@ export class handlePhisingLinksEditsListener extends Listener {
     }
 
     public async getAnalysesResult(analysesId: string, headers: HeadersInit | undefined, url: string): Promise<{ malicious: number } | null> {
-        await fetch(`https://www.virustotal.com/ui/urls/analyses/${analysesId}`, { headers });
+        const fetchResponse = await fetch(`https://www.virustotal.com/ui/urls/analyses/${analysesId}`, { headers });
+        if (fetchResponse.ok) {
+            const result = await fetchResponse.json() as { data: totalSearchResult["data"][0]["attributes"] };
+            return result.data.last_analysis_stats;
+        }
+
         const response = await fetch(`https://www.virustotal.com/ui/urls/search?limit=20&${encodeURIComponent("relationships[comment]")}=${encodeURIComponent("author,item")}&query=${encodeURIComponent(url)}`, { headers });
         if (response.ok) {
             const searchAnalysesResult = await response.json() as totalSearchResult;
