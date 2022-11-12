@@ -17,7 +17,11 @@ import { i18nManager } from "@nezuchan/i18n";
 import { TFunction } from "i18next";
 
 export class TanjiroClient extends EventEmitter {
-    public rest = new REST();
+    public rest = new REST({
+        api: process.env.NIRN_PROXY ?? "https://discord.com/api",
+        rejectOnRateLimit: () => process.env.NIRN_PROXY === undefined
+    });
+
     public prisma = new PrismaClient({ rejectOnNotFound: false });
     public mongoPrisma = new MongoPrismaClient({ rejectOnNotFound: false });
 
